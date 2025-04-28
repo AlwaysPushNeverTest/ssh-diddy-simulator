@@ -21,11 +21,17 @@ func (g *Game) CreateBoard() {
 func (g *Game) Render(s *ssh.Session) {
 	io.WriteString(*s, "\033[H\033[2J")
 
+	for i := range g.BoardHeight {
+		for j := range g.BoardWidth {
+			board[i][j] = ' '
+		}
+	}
+
 	for _, v := range g.Snakes {
 		board[v.Body[0].Y][v.Body[0].X] = v.Symbol
 	}
 
-	for range g.BoardHeight + 2 {
+	for range g.BoardWidth + 2 {
 		io.WriteString(*s, "#")
 	}
 
@@ -39,7 +45,7 @@ func (g *Game) Render(s *ssh.Session) {
 		io.WriteString(*s, "#\n")
 	}
 
-	for _ = range g.BoardHeight + 2 {
+	for _ = range g.BoardWidth + 2 {
 		io.WriteString(*s, "#")
 	}
 

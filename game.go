@@ -44,17 +44,22 @@ func (g *Game) Tick(s *ssh.Session) {
 		}
 		switch v.Direction {
 		case 'a':
-			v.Body[0].X--
+			if v.Body[0].X > 0 {
+				v.Body[0].X--
+			}
 		case 'd':
-			v.Body[0].X++
+			if v.Body[0].X < g.BoardWidth-1 {
+				v.Body[0].X++
+			}
 		case 'w':
-			v.Body[0].Y--
+			if v.Body[0].Y > 0 {
+				v.Body[0].Y--
+			}
 		case 's':
-			v.Body[0].Y++
+			if v.Body[0].Y < g.BoardHeight-1 {
+				v.Body[0].Y++
+			}
 		default:
-			continue
-		}
-		if v.Body[0].X < 0 || v.Body[0].X >= g.BoardWidth || v.Body[0].Y < 0 || v.Body[0].Y >= g.BoardHeight {
 			continue
 		}
 

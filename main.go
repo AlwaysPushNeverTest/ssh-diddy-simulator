@@ -14,14 +14,14 @@ func main() {
 		port = "8080"
 	}
 
-	game := NewGame(20, 20)
+	game := NewGame(50, 20)
 	game.CreateBoard()
 	ssh.Handle(func(s ssh.Session) {
 		user := s.RemoteAddr().String()
 		game.Mutex.Lock()
 		game.Snakes[user] = &Snake{
 			Symbol:    RandomRuneGen(),
-			Body:      []Position{{X: 10, Y: 10}},
+			Body:      []Position{{X: 25, Y: 10}},
 			Direction: 'd',
 			IsAlive:   true,
 		}
