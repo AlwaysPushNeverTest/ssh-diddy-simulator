@@ -34,10 +34,11 @@ func consumeInput(game *Game, remote string, inputCh <-chan rune, s *ssh.Session
 			game.Mutex.Lock()
 			game.Snakes[remote].Direction = r
 			game.Mutex.Unlock()
-			game.Tick(s)
 		case 'l':
 			io.WriteString(*s, "\033[H\033[2J")
+			game.Mutex.Lock()
 			delete(game.Snakes, remote)
+			game.Mutex.Unlock()
 			(*s).Exit(0)
 			return
 		default:

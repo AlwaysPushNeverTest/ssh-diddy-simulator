@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/gliderlabs/ssh"
 )
@@ -30,7 +31,18 @@ func main() {
 		inputCh := make(chan rune)
 
 		go consumeInput(game, user, inputCh, &s)
+		go func() {
+			for {
+				time.Sleep(time.Millisecond * 100)
+				game.Tick(&s)
+			}
+		}()
 		produceInput(s, inputCh)
+
+		// TO BE TESTED
+		game.Mutex.Lock()
+		delete(game.Snakes, user)
+		game.Mutex.Unlock()
 	})
 
 	log.Printf("listening on :%s …\n", port)
