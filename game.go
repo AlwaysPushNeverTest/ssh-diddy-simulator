@@ -8,6 +8,8 @@ import (
 
 type Board [][]rune
 
+type SymbolToColor map[rune]string
+
 type Game struct {
 	BoardWidth  int
 	BoardHeight int
@@ -17,6 +19,7 @@ type Game struct {
 
 type Snake struct {
 	Symbol    rune
+	Color     string
 	Body      []Position
 	Direction rune
 	IsAlive   bool
@@ -45,11 +48,11 @@ func (g *Game) Tick(s *ssh.Session) {
 		switch v.Direction {
 		case 'a':
 			if v.Body[0].X > 0 {
-				v.Body[0].X--
+				v.Body[0].X -= 2
 			}
 		case 'd':
 			if v.Body[0].X < g.BoardWidth-1 {
-				v.Body[0].X++
+				v.Body[0].X += 2
 			}
 		case 'w':
 			if v.Body[0].Y > 0 {
