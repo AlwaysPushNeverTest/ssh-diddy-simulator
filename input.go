@@ -37,6 +37,7 @@ func consumeInput(game *Game, remote string, inputCh <-chan rune, s *ssh.Session
 			game.Tick(s)
 		case 'l':
 			io.WriteString(*s, "\033[H\033[2J")
+			delete(game.Snakes, remote)
 			(*s).Exit(0)
 			return
 		default:
