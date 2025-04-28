@@ -16,15 +16,17 @@ func main() {
 
 	game := NewGame(20, 20)
 	game.CreateBoard()
-
 	ssh.Handle(func(s ssh.Session) {
 		user := s.RemoteAddr().String()
+		game.Mutex.Lock()
 		game.Snakes[user] = &Snake{
 			Symbol:    RandomRuneGen(),
-			Body:      []Position{{X: 10, Y: 10}}, // Initialize the snake's body with a starting position
-			Direction: 'd',                        // Set the initial direction of the snake
-			IsAlive:   true,                       // Set the snake's initial state to alive
+			Body:      []Position{{X: 10, Y: 10}},
+			Direction: 'd',
+			IsAlive:   true,
 		}
+		game.Mutex.Unlock()
+
 		inputCh := make(chan rune)
 
 		go consumeInput(game, user, inputCh, &s)

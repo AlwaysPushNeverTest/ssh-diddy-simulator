@@ -36,12 +36,12 @@ func NewGame(width, height int) *Game {
 }
 
 func (g *Game) Tick(s *ssh.Session) {
+	g.Mutex.Lock()
+	defer g.Mutex.Unlock()
 	for _, v := range g.Snakes {
 		if !v.IsAlive {
 			continue
 		}
-		g.Mutex.Lock()
-		defer g.Mutex.Unlock()
 		switch v.Direction {
 		case 'a':
 			v.Body[0].X--
