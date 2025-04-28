@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -9,17 +8,23 @@ import (
 	"github.com/gliderlabs/ssh"
 )
 
-var port string
-
 func main() {
-	ssh.Handle(func(s ssh.Session) {
-		io.WriteString(s, "Hello world\n")
-		handleInput(s, make(chan rune))
-	})
-	fmt.Println(os.Getenv("PORT"))
-	if port = os.Getenv("PORT"); port == "" {
-		port = "8081"
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
 
+	ssh.Handle(func(s ssh.Session) {
+
+		io.WriteString(s, "Type away (Ctrl-D to exit):\n")
+
+		inputCh := make(chan rune)
+
+		go consumeInput("user", inputCh)
+		produceInput(s, inputCh)
+	})
+
+	log.Printf("listening on :%s …\n", port)
 	log.Fatal(ssh.ListenAndServe(":"+port, nil))
 }

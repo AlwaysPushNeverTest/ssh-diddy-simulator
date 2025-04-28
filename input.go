@@ -1,19 +1,29 @@
 package main
 
 import (
-	"github.com/gliderlabs/ssh"
 	"io"
+	"log"
+
+	"github.com/gliderlabs/ssh"
 )
 
-func handleInput(s ssh.Session, inputChan chan<- rune) {
+func produceInput(s ssh.Session, inputCh chan<- rune) {
 	buf := make([]byte, 1)
+
 	for {
 		n, err := s.Read(buf)
 		if err != nil || n == 0 {
-			close(inputChan)
+			close(inputCh)
 			return
 		}
-		inputChan <- rune(buf[0])
-		io.WriteString(s, string(buf))
+		r := rune(buf[0])
+		inputCh <- r
+		io.Writer.Write(s, buf)
+	}
+}
+
+func consumeInput(remote string, inputCh <-chan rune) {
+	for r := range inputCh {
+		log.Printf("[%s] user typed: %q\n", remote, r)
 	}
 }
