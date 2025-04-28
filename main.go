@@ -14,10 +14,12 @@ var port string
 func main() {
 	ssh.Handle(func(s ssh.Session) {
 		io.WriteString(s, "Hello world\n")
+		handleInput(s, make(chan rune))
 	})
 	fmt.Println(os.Getenv("PORT"))
 	if port = os.Getenv("PORT"); port == "" {
-		port = "8080"
+		port = "8081"
 	}
+
 	log.Fatal(ssh.ListenAndServe(":"+port, nil))
 }
