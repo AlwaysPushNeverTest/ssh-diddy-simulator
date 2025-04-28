@@ -16,6 +16,7 @@ type Game struct {
 }
 
 type Snake struct {
+	Symbol    rune
 	Body      []Position
 	Direction rune
 	IsAlive   bool

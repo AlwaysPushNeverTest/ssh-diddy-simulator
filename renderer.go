@@ -22,10 +22,10 @@ func (g *Game) Render(s *ssh.Session) {
 	io.WriteString(*s, "\033[H\033[2J")
 
 	for _, v := range g.Snakes {
-		board[v.Body[0].Y][v.Body[0].X] = 'N'
+		board[v.Body[0].Y][v.Body[0].X] = v.Symbol
 	}
 
-	for _ = range g.BoardHeight + 2 {
+	for range g.BoardHeight + 2 {
 		io.WriteString(*s, "#")
 	}
 

@@ -20,6 +20,7 @@ func main() {
 	ssh.Handle(func(s ssh.Session) {
 		user := s.RemoteAddr().String()
 		game.Snakes[user] = &Snake{
+			Symbol:    RandomRuneGen(),
 			Body:      []Position{{X: 10, Y: 10}}, // Initialize the snake's body with a starting position
 			Direction: 'd',                        // Set the initial direction of the snake
 			IsAlive:   true,                       // Set the snake's initial state to alive
