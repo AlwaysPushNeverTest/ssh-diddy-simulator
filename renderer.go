@@ -25,26 +25,23 @@ func (g *Game) Render(s *ssh.Session) {
 		board[v.Body[0].Y][v.Body[0].X] = 'N'
 	}
 
+	for _ = range g.BoardHeight + 2 {
+		io.WriteString(*s, "#")
+	}
+
+	io.WriteString(*s, "\n")
+
 	for i := range g.BoardHeight {
+		io.WriteString(*s, "#")
 		for j := range g.BoardWidth {
 			io.WriteString(*s, string(board[i][j]))
 		}
-		io.WriteString(*s, "\n")
+		io.WriteString(*s, "#\n")
 	}
 
-	// for i := range(g.BoardWidth + 2) {
-	// 	fmt.Printf("#")
-	// }
-	// for i := range(g.BoardHeight) {
-	// 	fmt.Printf("#")
+	for _ = range g.BoardHeight + 2 {
+		io.WriteString(*s, "#")
+	}
 
-	// 	for j := range(g.BoardWidth) {
-
-	// 	}
-
-	// 	fmt.Printf("#")
-	// }
-	// for i := range(g.BoardWidth + 2) {
-	// 	fmt.Printf("#")
-	// }
+	io.WriteString(*s, "\n")
 }

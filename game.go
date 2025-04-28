@@ -54,7 +54,7 @@ func (g *Game) Tick(s *ssh.Session) {
 			continue
 		}
 		if v.Body[0].X < 0 || v.Body[0].X >= g.BoardWidth || v.Body[0].Y < 0 || v.Body[0].Y >= g.BoardHeight {
-			v.IsAlive = false
+			continue
 		}
 
 		g.Render(s)
