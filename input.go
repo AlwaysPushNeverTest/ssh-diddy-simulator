@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"log"
 
 	"github.com/gliderlabs/ssh"
 )
@@ -22,8 +21,22 @@ func produceInput(s ssh.Session, inputCh chan<- rune) {
 	}
 }
 
-func consumeInput(remote string, inputCh <-chan rune) {
+func consumeInput(game *Game, remote string, inputCh <-chan rune, s *ssh.Session) {
 	for r := range inputCh {
-		log.Printf("[%s] user typed: %q\n", remote, r)
+		switch r {
+		case 'a':
+			fallthrough
+		case 'd':
+			fallthrough
+		case 'w':
+			fallthrough
+		case 's':
+			game.Mutex.Lock()
+			game.Snakes[remote].Direction = r
+			game.Mutex.Unlock()
+			game.Tick(s)
+		default:
+			continue
+		}
 	}
 }
