@@ -1,7 +1,9 @@
 package main
 
 import (
+	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/gliderlabs/ssh"
 )
@@ -14,6 +16,7 @@ type Game struct {
 	BoardWidth  int
 	BoardHeight int
 	Snakes      map[string]*Snake
+	Food        map[Position]*Food
 	Mutex       sync.Mutex
 }
 
@@ -23,6 +26,13 @@ type Snake struct {
 	Body      []Position
 	Direction rune
 	IsAlive   bool
+}
+
+type Food struct {
+	CreatedAt time.Time
+	LifeTime  time.Duration
+	DickSize  int
+	Symbol    rune
 }
 
 type Position struct {
@@ -35,12 +45,39 @@ func NewGame(width, height int) *Game {
 		BoardWidth:  width,
 		BoardHeight: height,
 		Snakes:      make(map[string]*Snake),
+		Food:        make(map[Position]*Food),
+	}
+}
+
+func (g *Game) spawnApple() {
+	p := Position{
+		X: rand.Intn(g.BoardWidth),
+		Y: rand.Intn(g.BoardHeight),
+	}
+
+	g.Food[p] = &Food{
+		CreatedAt: time.Now(),
+		LifeTime:  time.Second,
+		DickSize:  1,
+		Symbol:    '🧴',
 	}
 }
 
 func (g *Game) Tick(s *ssh.Session) {
 	g.Mutex.Lock()
 	defer g.Mutex.Unlock()
+
+	now := time.Now()
+	for pos, food := range g.Food {
+		if now.Sub(food.CreatedAt) > food.LifeTime {
+			delete(g.Food, pos)
+		}
+	}
+
+	if len(g.Food) == 0 || rand.Float64() < 0.1 {
+		g.spawnApple()
+	}
+
 	for _, v := range g.Snakes {
 		if !v.IsAlive {
 			continue

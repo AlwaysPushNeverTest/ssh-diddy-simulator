@@ -28,6 +28,10 @@ func (g *Game) Render(s *ssh.Session) {
 		}
 	}
 
+	for pos, food := range g.Food {
+		board[pos.Y][pos.X] = food.Symbol
+	}
+
 	for _, v := range g.Snakes {
 		board[v.Body[0].Y][v.Body[0].X] = v.Symbol
 	}
@@ -41,13 +45,14 @@ func (g *Game) Render(s *ssh.Session) {
 	for i := range g.BoardHeight {
 		io.WriteString(*s, "#")
 		for j := range g.BoardWidth {
-			toPrint := string(board[i][j])
-			if symbolToColor[board[i][j]] != "" {
-				toPrint = symbolToColor[board[i][j]] + string(board[i][j]) + "\033[0m"
+			cell := board[i][j]
+			if cell == ' ' {
+				io.WriteString(*s, " ")
+			} else if color, ok := symbolToColor[cell]; ok {
+				io.WriteString(*s, color+string(cell)+"\033[0m")
 			} else {
-				toPrint = " "
+				io.WriteString(*s, string(cell))
 			}
-			io.WriteString(*s, toPrint)
 		}
 		io.WriteString(*s, "#\n")
 	}
