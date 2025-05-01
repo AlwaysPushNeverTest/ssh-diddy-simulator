@@ -38,7 +38,7 @@ func main() {
 		go consumeInput(game, user, inputCh, &s)
 		go func() {
 			for {
-				time.Sleep(time.Millisecond * 200)
+				time.Sleep(time.Millisecond * 50)
 				game.Tick(&s)
 			}
 		}()
