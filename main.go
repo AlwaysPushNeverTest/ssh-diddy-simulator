@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"log"
 	"os"
 	"time"
@@ -16,35 +15,36 @@ func main() {
 		port = "8080"
 	}
 
-	symbolToColor = make(SymbolToColor)
 	game := NewGame(50, 20)
 	game.CreateBoard()
 	ssh.Handle(func(s ssh.Session) {
-		io.WriteString(s, "\033[33m")
 		user := s.RemoteAddr().String()
 		game.Mutex.Lock()
 		game.Snakes[user] = &Snake{
 			Symbol:    RandomRuneGen(),
-			Color:     RandomColorGen(),
 			Body:      []Position{{X: 25, Y: 10}},
 			Direction: 'd',
 			IsAlive:   true,
 		}
-		symbolToColor[game.Snakes[user].Symbol] = game.Snakes[user].Color
 		game.Mutex.Unlock()
 
 		inputCh := make(chan rune)
 
 		go consumeInput(game, user, inputCh, &s)
 		go func() {
+			ticker := time.NewTicker(100 * time.Millisecond)
+			defer ticker.Stop()
 			for {
-				time.Sleep(time.Millisecond * 50)
-				game.Tick(&s)
+				select {
+				case <-ticker.C:
+					game.Tick(&s)
+				case <-s.Context().Done():
+					return
+				}
 			}
 		}()
 		produceInput(s, inputCh)
 
-		// TO BE TESTED
 		game.Mutex.Lock()
 		delete(game.Snakes, user)
 		game.Mutex.Unlock()
