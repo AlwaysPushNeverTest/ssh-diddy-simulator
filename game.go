@@ -49,10 +49,15 @@ func (g *Game) Tick(s *ssh.Session) {
 		case 'a':
 			if v.Body[0].X > 1 {
 				v.Body[0].X -= 2
+			} else {
+				v.Body[0].X = 0
+				// And u dead asf
 			}
 		case 'd':
 			if v.Body[0].X < g.BoardWidth-2 {
 				v.Body[0].X += 2
+			} else {
+				v.Body[0].X = g.BoardWidth - 1
 			}
 		case 'w':
 			if v.Body[0].Y > 0 {
