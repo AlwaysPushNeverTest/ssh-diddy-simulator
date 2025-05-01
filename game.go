@@ -57,9 +57,26 @@ func (g *Game) spawnApple() {
 
 	g.Food[p] = &Food{
 		CreatedAt: time.Now(),
-		LifeTime:  time.Second,
+		LifeTime:  time.Second * 10,
 		DickSize:  1,
-		Symbol:    '🧴',
+		Symbol:    'ϖ',
+	}
+}
+
+func (g *Game) HandleCollision(snake *Snake, s *ssh.Session) {
+	for pos, _ := range g.Food {
+		if snake.Body[0].X != pos.X || snake.Body[0].Y != pos.Y {
+			continue
+		}
+
+		snake.IsAlive = true
+		delete(g.Food, pos)
+
+		// newBodyPos := snake.Body[len(snake.Body)-1]
+		// snake.Body = append(snake.Body, newBodyPos)
+		// for i := range snake.Body {
+		// 	snake.Body[i-1] = snake.Body[i]
+		// }
 	}
 }
 
@@ -84,17 +101,12 @@ func (g *Game) Tick(s *ssh.Session) {
 		}
 		switch v.Direction {
 		case 'a':
-			if v.Body[0].X > 1 {
-				v.Body[0].X -= 2
-			} else {
-				v.Body[0].X = 0
-				// And u dead asf
+			if v.Body[0].X > 0 {
+				v.Body[0].X--
 			}
 		case 'd':
-			if v.Body[0].X < g.BoardWidth-2 {
-				v.Body[0].X += 2
-			} else {
-				v.Body[0].X = g.BoardWidth - 1
+			if v.Body[0].X < g.BoardWidth-1 {
+				v.Body[0].X++
 			}
 		case 'w':
 			if v.Body[0].Y > 0 {
@@ -108,6 +120,11 @@ func (g *Game) Tick(s *ssh.Session) {
 			continue
 		}
 
+		for i := len(v.Body) - 1; i > 0; i-- {
+			v.Body[i] = v.Body[i-1]
+		}
+
 		g.Render(s)
+		g.HandleCollision(v, s)
 	}
 }
