@@ -72,11 +72,10 @@ func (g *Game) HandleCollision(snake *Snake, s *ssh.Session) {
 		snake.IsAlive = true
 		delete(g.Food, pos)
 
-		// newBodyPos := snake.Body[len(snake.Body)-1]
-		// snake.Body = append(snake.Body, newBodyPos)
-		// for i := range snake.Body {
-		// 	snake.Body[i-1] = snake.Body[i]
-		// }
+		snake.Body = append(snake.Body, pos)
+		for i := 1; i < len(snake.Body); i++ {
+			snake.Body[i-1] = snake.Body[i]
+		}
 	}
 }
 
@@ -120,11 +119,11 @@ func (g *Game) Tick(s *ssh.Session) {
 			continue
 		}
 
+		g.HandleCollision(v, s)
 		for i := len(v.Body) - 1; i > 0; i-- {
 			v.Body[i] = v.Body[i-1]
 		}
 
 		g.Render(s)
-		g.HandleCollision(v, s)
 	}
 }

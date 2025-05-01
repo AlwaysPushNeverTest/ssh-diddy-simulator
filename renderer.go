@@ -33,7 +33,9 @@ func (g *Game) Render(s *ssh.Session) {
 	}
 
 	for _, v := range g.Snakes {
-		board[v.Body[0].Y][v.Body[0].X] = v.Symbol
+		for _, pos := range v.Body {
+			board[pos.Y][pos.X] = v.Symbol
+		}
 	}
 
 	for range g.BoardWidth + 2 {
