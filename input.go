@@ -22,6 +22,8 @@ func produceInput(s ssh.Session, inputCh chan<- rune) {
 }
 
 func consumeInput(game *Game, remote string, inputCh <-chan rune, s *ssh.Session) {
+	directions := []rune{'w', 'a', 's', 'd'}
+
 	for r := range inputCh {
 		switch r {
 		case 'a':
@@ -31,6 +33,16 @@ func consumeInput(game *Game, remote string, inputCh <-chan rune, s *ssh.Session
 		case 'w':
 			fallthrough
 		case 's':
+			indexOfDir := 0
+			for i, v := range directions {
+				if v == r {
+					indexOfDir = i
+					break
+				}
+			}
+			if directions[(indexOfDir+2)%4] == game.Snakes[remote].Direction {
+				continue
+			}
 			game.Mutex.Lock()
 			game.Snakes[remote].Direction = r
 			game.Mutex.Unlock()
