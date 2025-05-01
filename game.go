@@ -40,6 +40,12 @@ type Position struct {
 	Y int
 }
 
+func (g *Game) DeleteSnake(id string) {
+	g.Mutex.Lock()
+	delete(g.Snakes, id)
+	g.Mutex.Unlock()
+}
+
 func NewGame(width, height int) *Game {
 	return &Game{
 		BoardWidth:  width,
@@ -63,7 +69,7 @@ func (g *Game) spawnApple() {
 	}
 }
 
-func (g *Game) HandleCollision(snake *Snake, s *ssh.Session) {
+func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
 	for pos, _ := range g.Food {
 		if snake.Body[0].X != pos.X || snake.Body[0].Y != pos.Y {
 			continue
@@ -75,6 +81,30 @@ func (g *Game) HandleCollision(snake *Snake, s *ssh.Session) {
 		snake.Body = append(snake.Body, pos)
 		for i := 1; i < len(snake.Body); i++ {
 			snake.Body[i-1] = snake.Body[i]
+		}
+	}
+}
+
+func (g *Game) HandleSnakeCollision(snake *Snake, s *ssh.Session) {
+	for id, v := range g.Snakes {
+		if v == snake {
+			for i := 1; i < len(v.Body); i++ {
+				if snake.Body[0].X == v.Body[i].X && snake.Body[0].Y == v.Body[i].Y {
+					g.DeleteSnake(id)
+					return
+				}
+			}
+			continue
+		}
+		for _, pos := range v.Body {
+			if snake.Body[0].X == pos.X && snake.Body[0].Y == pos.Y {
+				if len(snake.Body) > len(v.Body) {
+					g.DeleteSnake(id)
+				} else {
+					g.DeleteSnake((*s).RemoteAddr().String())
+				}
+				return
+			}
 		}
 	}
 }
@@ -119,10 +149,11 @@ func (g *Game) Tick(s *ssh.Session) {
 			continue
 		}
 
-		g.HandleCollision(v, s)
+		g.HandleFoodCollision(v, s)
 		for i := len(v.Body) - 1; i > 0; i-- {
 			v.Body[i] = v.Body[i-1]
 		}
+		g.HandleSnakeCollision(v, s)
 
 		g.Render(s)
 	}
