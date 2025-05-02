@@ -77,9 +77,9 @@ func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
 		delete(g.Food, pos)
 		snake.Body = append(snake.Body, lastPos)
 
-		for i := 1; i < len(snake.Body); i++ {
-			snake.Body[i-1] = snake.Body[i]
-		}
+		// for i := 1; i < len(snake.Body); i++ {
+		// 	snake.Body[i-1] = snake.Body[i]
+		// }
 	}
 }
 
