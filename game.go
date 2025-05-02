@@ -129,30 +129,35 @@ func (g *Game) Tick(s *ssh.Session) {
 	if !g.Snakes[(*s).RemoteAddr().String()].IsAlive {
 		delete(g.Snakes, (*s).RemoteAddr().String())
 	}
+	var lastPos Position = snake.Body[0]
 
 	switch snake.Direction {
 	case 'a':
 		if snake.Body[0].X > 0 {
-			snake.Body[0].X--
+			lastPos.X--
 		}
 	case 'd':
 		if snake.Body[0].X < g.BoardWidth-1 {
-			snake.Body[0].X++
+			lastPos.X++
 		}
 	case 'w':
 		if snake.Body[0].Y > 0 {
-			snake.Body[0].Y--
+			lastPos.Y--
 		}
 	case 's':
 		if snake.Body[0].Y < g.BoardHeight-1 {
-			snake.Body[0].Y++
+			lastPos.Y++
 		}
 	default:
 		return
 	}
+
 	for i := len(snake.Body) - 1; i > 0; i-- {
 		snake.Body[i] = snake.Body[i-1]
 	}
+
+	snake.Body[0] = lastPos
+
 	g.HandleFoodCollision(snake, s)
 	g.HandleSnakeCollision(snake, s)
 
