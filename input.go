@@ -33,6 +33,9 @@ func consumeInput(game *Game, remote string, inputCh <-chan rune, s *ssh.Session
 		case 'w':
 			fallthrough
 		case 's':
+			if !game.Snakes[remote].IsAlive {
+				continue
+			}
 			indexOfDir := 0
 			for i, v := range directions {
 				if v == r {
