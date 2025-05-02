@@ -76,16 +76,18 @@ func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
 		lastPos := snake.Body[len(snake.Body)-1]
 		delete(g.Food, pos)
 		snake.Body = append(snake.Body, lastPos)
-
-		// for i := 1; i < len(snake.Body); i++ {
-		// 	snake.Body[i-1] = snake.Body[i]
-		// }
 	}
 }
 
 func (g *Game) HandleSnakeCollision(snake *Snake, s *ssh.Session) {
 	for _, s := range g.Snakes {
 		if s == snake {
+
+			for _, pos := range snake.Body[1:] {
+				if pos.X == snake.Body[0].X && pos.Y == snake.Body[0].Y {
+					snake.IsAlive = false
+				}
+			}
 			continue
 		}
 
