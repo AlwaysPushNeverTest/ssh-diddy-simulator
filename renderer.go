@@ -19,8 +19,8 @@ func (g *Game) CreateBoard() {
 	}
 }
 
-func (g *Game) Render(s *ssh.Session) {
-	io.WriteString(*s, "\033[H\033[2J")
+func (g *Game) Render(s ssh.Session) {
+	io.WriteString(s, "\033[H\033[2J")
 
 	for i := range g.BoardHeight {
 		for j := range g.BoardWidth {
@@ -39,29 +39,29 @@ func (g *Game) Render(s *ssh.Session) {
 	}
 
 	for range g.BoardWidth + 2 {
-		io.WriteString(*s, "#")
+		io.WriteString(s, "#")
 	}
 
-	io.WriteString(*s, "\n")
+	io.WriteString(s, "\n")
 
 	for i := range g.BoardHeight {
-		io.WriteString(*s, "#")
+		io.WriteString(s, "#")
 		for j := range g.BoardWidth {
 			cell := board[i][j]
 			if cell == ' ' {
-				io.WriteString(*s, " ")
+				io.WriteString(s, " ")
 			} else if color, ok := symbolToColor[cell]; ok {
-				io.WriteString(*s, color+string(cell)+"\033[0m")
+				io.WriteString(s, color+string(cell)+"\033[0m")
 			} else {
-				io.WriteString(*s, string(cell))
+				io.WriteString(s, string(cell))
 			}
 		}
-		io.WriteString(*s, "#\n")
+		io.WriteString(s, "#\n")
 	}
 
 	for _ = range g.BoardWidth + 2 {
-		io.WriteString(*s, "#")
+		io.WriteString(s, "#")
 	}
 
-	io.WriteString(*s, "\n")
+	io.WriteString(s, "\n")
 }

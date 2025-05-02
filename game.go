@@ -67,7 +67,7 @@ func (g *Game) spawnApple() {
 	}
 }
 
-func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
+func (g *Game) HandleFoodCollision(snake *Snake, s ssh.Session) {
 	for pos, _ := range g.Food {
 		if snake.Body[0].X != pos.X || snake.Body[0].Y != pos.Y {
 			continue
@@ -79,7 +79,7 @@ func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
 	}
 }
 
-func (g *Game) HandleSnakeCollision(snake *Snake, s *ssh.Session) {
+func (g *Game) HandleSnakeCollision(snake *Snake, s ssh.Session) {
 	for _, s := range g.Snakes {
 		if s == snake {
 
@@ -106,7 +106,7 @@ func (g *Game) HandleSnakeCollision(snake *Snake, s *ssh.Session) {
 	}
 }
 
-func (g *Game) Tick(s *ssh.Session) {
+func (g *Game) Tick(s ssh.Session) {
 	g.Mutex.Lock()
 	defer g.Mutex.Unlock()
 
@@ -120,14 +120,14 @@ func (g *Game) Tick(s *ssh.Session) {
 	if len(g.Food) == 0 || rand.Float64() < 0.1 {
 		g.spawnApple()
 	}
-	snake, ok := g.Snakes[(*s).RemoteAddr().String()]
+	snake, ok := g.Snakes[s.RemoteAddr().String()]
 
 	if !ok {
 		return
 	}
 
-	if !g.Snakes[(*s).RemoteAddr().String()].IsAlive {
-		delete(g.Snakes, (*s).RemoteAddr().String())
+	if !g.Snakes[s.RemoteAddr().String()].IsAlive {
+		delete(g.Snakes, s.RemoteAddr().String())
 	}
 
 	lastPos := snake.Body[0]

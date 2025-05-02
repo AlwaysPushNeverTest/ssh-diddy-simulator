@@ -34,14 +34,14 @@ func main() {
 
 		inputCh := make(chan rune)
 
-		go consumeInput(game, user, inputCh, &s)
+		go consumeInput(game, user, inputCh, s)
 		go func() {
 			ticker := time.NewTicker(100 * time.Millisecond)
 			defer ticker.Stop()
 			for {
 				select {
 				case <-ticker.C:
-					game.Tick(&s)
+					game.Tick(s)
 				case <-s.Context().Done():
 					return
 				}

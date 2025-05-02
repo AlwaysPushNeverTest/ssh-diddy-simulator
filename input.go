@@ -21,7 +21,7 @@ func produceInput(s ssh.Session, inputCh chan<- rune) {
 	}
 }
 
-func consumeInput(game *Game, remote string, inputCh <-chan rune, s *ssh.Session) {
+func consumeInput(game *Game, remote string, inputCh <-chan rune, s ssh.Session) {
 	directions := []rune{'w', 'a', 's', 'd'}
 
 	for r := range inputCh {
@@ -50,11 +50,11 @@ func consumeInput(game *Game, remote string, inputCh <-chan rune, s *ssh.Session
 			game.Snakes[remote].Direction = r
 			game.Mutex.Unlock()
 		case 'l':
-			io.WriteString(*s, "\033[H\033[2J")
+			io.WriteString(s, "\033[H\033[2J")
 			game.Mutex.Lock()
 			delete(game.Snakes, remote)
 			game.Mutex.Unlock()
-			(*s).Exit(0)
+			s.Exit(0)
 			return
 		default:
 			continue
