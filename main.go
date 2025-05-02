@@ -17,15 +17,19 @@ func main() {
 
 	game := NewGame(50, 20)
 	game.CreateBoard()
+	symbolToColor = make(SymbolToColor)
+
 	ssh.Handle(func(s ssh.Session) {
 		user := s.RemoteAddr().String()
 		game.Mutex.Lock()
 		game.Snakes[user] = &Snake{
 			Symbol:    RandomRuneGen(),
+			Color:     RandomColorGen(),
 			Body:      []Position{{X: 25, Y: 10}},
 			Direction: 'd',
 			IsAlive:   true,
 		}
+		symbolToColor[game.Snakes[user].Symbol] = game.Snakes[user].Color
 		game.Mutex.Unlock()
 
 		inputCh := make(chan rune)
