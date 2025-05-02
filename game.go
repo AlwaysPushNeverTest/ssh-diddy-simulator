@@ -75,10 +75,12 @@ func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
 			continue
 		}
 
-		snake.IsAlive = true
+		lastPos := snake.Body[len(snake.Body)-1]
+
 		delete(g.Food, pos)
 
-		snake.Body = append(snake.Body, pos)
+		snake.Body = append(snake.Body, lastPos)
+
 		for i := 1; i < len(snake.Body); i++ {
 			snake.Body[i-1] = snake.Body[i]
 		}
@@ -88,22 +90,17 @@ func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
 func (g *Game) HandleSnakeCollision(snake *Snake, s *ssh.Session) {
 	for id, v := range g.Snakes {
 		if v == snake {
-			for i := 1; i < len(v.Body); i++ {
-				if snake.Body[0].X == v.Body[i].X && snake.Body[0].Y == v.Body[i].Y {
-					g.DeleteSnake(id)
-					return
-				}
-			}
 			continue
 		}
 		for _, pos := range v.Body {
 			if snake.Body[0].X == pos.X && snake.Body[0].Y == pos.Y {
 				if len(snake.Body) > len(v.Body) {
 					g.DeleteSnake(id)
+					return
+
 				} else {
 					g.DeleteSnake((*s).RemoteAddr().String())
 				}
-				return
 			}
 		}
 	}
@@ -123,38 +120,37 @@ func (g *Game) Tick(s *ssh.Session) {
 	if len(g.Food) == 0 || rand.Float64() < 0.1 {
 		g.spawnApple()
 	}
+	snake, ok := g.Snakes[(*s).RemoteAddr().String()]
 
-	for _, v := range g.Snakes {
-		if !v.IsAlive {
-			continue
-		}
-		switch v.Direction {
-		case 'a':
-			if v.Body[0].X > 0 {
-				v.Body[0].X--
-			}
-		case 'd':
-			if v.Body[0].X < g.BoardWidth-1 {
-				v.Body[0].X++
-			}
-		case 'w':
-			if v.Body[0].Y > 0 {
-				v.Body[0].Y--
-			}
-		case 's':
-			if v.Body[0].Y < g.BoardHeight-1 {
-				v.Body[0].Y++
-			}
-		default:
-			continue
-		}
-
-		g.HandleFoodCollision(v, s)
-		for i := len(v.Body) - 1; i > 0; i-- {
-			v.Body[i] = v.Body[i-1]
-		}
-		g.HandleSnakeCollision(v, s)
-
-		g.Render(s)
+	if !ok {
+		return
 	}
+
+	switch snake.Direction {
+	case 'a':
+		if snake.Body[0].X > 0 {
+			snake.Body[0].X--
+		}
+	case 'd':
+		if snake.Body[0].X < g.BoardWidth-1 {
+			snake.Body[0].X++
+		}
+	case 'w':
+		if snake.Body[0].Y > 0 {
+			snake.Body[0].Y--
+		}
+	case 's':
+		if snake.Body[0].Y < g.BoardHeight-1 {
+			snake.Body[0].Y++
+		}
+	default:
+		return
+	}
+	g.HandleFoodCollision(snake, s)
+	for i := len(snake.Body) - 1; i > 0; i-- {
+		snake.Body[i] = snake.Body[i-1]
+	}
+	g.HandleSnakeCollision(snake, s)
+
+	g.Render(s)
 }
