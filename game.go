@@ -41,9 +41,7 @@ type Position struct {
 }
 
 func (g *Game) DeleteSnake(id string) {
-	g.Mutex.Lock()
 	delete(g.Snakes, id)
-	g.Mutex.Unlock()
 }
 
 func NewGame(width, height int) *Game {
@@ -76,9 +74,7 @@ func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
 		}
 
 		lastPos := snake.Body[len(snake.Body)-1]
-
 		delete(g.Food, pos)
-
 		snake.Body = append(snake.Body, lastPos)
 
 		for i := 1; i < len(snake.Body); i++ {
@@ -88,18 +84,20 @@ func (g *Game) HandleFoodCollision(snake *Snake, s *ssh.Session) {
 }
 
 func (g *Game) HandleSnakeCollision(snake *Snake, s *ssh.Session) {
-	for id, v := range g.Snakes {
-		if v == snake {
+	for _, s := range g.Snakes {
+		if s == snake {
 			continue
 		}
-		for _, pos := range v.Body {
-			if snake.Body[0].X == pos.X && snake.Body[0].Y == pos.Y {
-				if len(snake.Body) > len(v.Body) {
-					g.DeleteSnake(id)
-					return
 
+		for _, pos := range s.Body {
+			if snake.Body[0].X == pos.X && snake.Body[0].Y == pos.Y {
+				if len(snake.Body) > len(s.Body) {
+					s.IsAlive = false
+				} else if len(snake.Body) < len(s.Body) {
+					snake.IsAlive = false
 				} else {
-					g.DeleteSnake((*s).RemoteAddr().String())
+					s.IsAlive = false
+					snake.IsAlive = false
 				}
 			}
 		}
@@ -126,6 +124,10 @@ func (g *Game) Tick(s *ssh.Session) {
 		return
 	}
 
+	if !g.Snakes[(*s).RemoteAddr().String()].IsAlive {
+		delete(g.Snakes, (*s).RemoteAddr().String())
+	}
+
 	switch snake.Direction {
 	case 'a':
 		if snake.Body[0].X > 0 {
@@ -146,10 +148,10 @@ func (g *Game) Tick(s *ssh.Session) {
 	default:
 		return
 	}
-	g.HandleFoodCollision(snake, s)
 	for i := len(snake.Body) - 1; i > 0; i-- {
 		snake.Body[i] = snake.Body[i-1]
 	}
+	g.HandleFoodCollision(snake, s)
 	g.HandleSnakeCollision(snake, s)
 
 	g.Render(s)
