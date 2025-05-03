@@ -17,7 +17,7 @@ func produceInput(s ssh.Session, inputCh chan<- rune) {
 		}
 		r := rune(buf[0])
 		inputCh <- r
-		io.Writer.Write(s, buf)
+		s.Write(buf)
 	}
 }
 

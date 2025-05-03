@@ -107,6 +107,7 @@ func (g *Game) HandleSnakeCollision(snake *Snake, s ssh.Session) {
 }
 
 func (g *Game) Tick(s ssh.Session) {
+
 	g.Mutex.Lock()
 	defer g.Mutex.Unlock()
 
