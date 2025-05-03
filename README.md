@@ -65,8 +65,9 @@ Naveed is the kind of guy who:
 * **Commits directly to `main`,**
 * And still says **"it works on my machine."**
 
-> [!CAUTION] DO NOT let Naveed near this codebase.
->
+> [!CAUTION]
+> DO NOT let Naveed near this codebase.
+> 
 > **Do not code review with him. Do not merge his branches. Do not speak his variable names aloud.**
 >
 > We are still undoing what he called "aesthetic concurrency".
