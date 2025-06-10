@@ -1,4 +1,4 @@
-# ssh-diddy-simulator
+# ssh-snake  
 
 **2 men - 2 cigarettes - 7 hours.**
 
